@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>פורטל ביטחון | הר ברכה</title>
+<style>
+  :root {
+    --bg:#0f1923; --surface:#162030; --card:#1c2a3a; --border:#243447;
+    --accent:#2d7dd2; --accentHi:#4a9eff; --text:#e8edf2; --muted:#6b8299;
+    --green:#38a169; --yellow:#d69e2e; --orange:#dd6b20; --red:#e53e3e;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;direction:rtl;min-height:100vh;}
+  button{cursor:pointer;font-family:inherit;}
+  input{font-family:inherit;}
+
+  /* LOGIN */
+  #login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;position:relative;}
+  .grid-bg{position:fixed;inset:0;opacity:.04;background-image:linear-gradient(#4a9eff 1px,transparent 1px),linear-gradient(90deg,#4a9eff 1px,transparent 1px);background-size:40px 40px;pointer-events:none;}
+  .login-box{background:var(--card);border:1px solid var(--border);border-top:3px solid var(--accent);border-radius:16px;padding:40px 36px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,.5);animation:fadeIn .5s ease;}
+  .login-logo{text-align:center;margin-bottom:32px;}
+  .login-icon{width:56px;height:56px;background:linear-gradient(135deg,var(--accent),#1a4f8a);border-radius:14px;display:inline-flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:14px;box-shadow:0 0 24px #2d7dd244;}
+  .login-title{font-size:20px;font-weight:800;letter-spacing:-.5px;}
+  .login-sub{font-size:12px;color:var(--muted);margin-top:3px;letter-spacing:2px;}
+  .field-label{font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:600;}
+  .field-wrap{margin-bottom:16px;}
+  .field-input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-size:14px;outline:none;direction:rtl;}
+  .field-input:focus{border-color:var(--accent);}
+  .field-input.err{border-color:var(--red);}
+  .login-err{color:var(--red);font-size:12px;text-align:center;margin-bottom:12px;}
+  .login-btn{width:100%;background:linear-gradient(135deg,var(--accent),#1a4f8a);color:#fff;border:none;border-radius:8px;padding:12px;font-size:15px;font-weight:700;box-shadow:0 4px 16px #2d7dd244;}
+  .login-footer{text-align:center;margin-top:20px;font-size:11px;color:var(--muted);}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}60%{transform:translateX(8px)}}
+  .shake{animation:shake .4s ease;}
+
+  /* TOPBAR */
+  .topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px;}
+  .topbar-left{display:flex;align-items:center;gap:12px;}
+  .topbar-title{font-weight:800;font-size:15px;}
+  .topbar-sub{color:var(--muted);font-size:12px;margin-right:8px;}
+  .topbar-right{display:flex;align-items:center;gap:14px;}
+  .topbar-user{font-size:12px;color:var(--muted);}
+  .topbar-user strong{color:var(--accentHi);}
+  .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:4px 12px;font-size:12px;}
+
+  /* DASHBOARD */
+  .page{padding:28px 24px;max-width:860px;margin:0 auto;}
+  .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px;}
+  .stat-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
+  .stat-icon{font-size:20px;margin-bottom:6px;}
+  .stat-val{font-size:24px;font-weight:800;}
+  .stat-label{font-size:11px;color:var(--muted);margin-top:2px;}
+  .section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+  .section-title{font-size:14px;font-weight:700;}
+  .section-hint{font-size:11px;color:var(--muted);}
+  .report-list{display:flex;flex-direction:column;gap:10px;}
+  .report-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 20px;cursor:pointer;transition:border-color .2s,transform .15s;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+  .report-card:hover{border-color:var(--accent);transform:translateY(-1px);}
+  .report-card-left{}
+  .report-card-meta{display:flex;gap:8px;align-items:center;margin-bottom:6px;}
+  .report-date{font-weight:700;font-size:15px;}
+  .report-summary{font-size:12px;color:var(--muted);}
+  .report-card-right{display:flex;gap:16px;align-items:center;}
+  .stat-mini{text-align:center;}
+  .stat-mini-val{font-size:18px;font-weight:800;}
+  .stat-mini-label{font-size:10px;color:var(--muted);}
+  .arrow{color:var(--accent);font-size:18px;}
+  .add-card{margin-top:20px;background:var(--card);border:1px dashed var(--border);border-radius:12px;padding:20px;text-align:center;color:var(--muted);font-size:13px;}
+
+  /* TAGS & BADGES */
+  .tag{display:inline-block;border-radius:20px;padding:2px 10px;font-size:11px;}
+  .badge{border-radius:20px;padding:2px 10px;font-size:11px;font-weight:700;letter-spacing:.5px;}
+  .badge-ok{background:#38a16922;color:var(--green);border:1px solid #38a16944;}
+  .badge-warning{background:#dd6b2022;color:var(--orange);border:1px solid #dd6b2044;}
+  .badge-alert{background:#e53e3e22;color:var(--red);border:1px solid #e53e3e44;}
+
+  /* REPORT VIEWER */
+  .report-header{background:linear-gradient(135deg,#0d2137,#1a3a5c);border-bottom:1px solid var(--border);padding:0 24px;}
+  .report-topbar{display:flex;align-items:center;justify-content:space-between;height:52px;border-bottom:1px solid #24344722;}
+  .report-meta{padding:16px 0 0;}
+  .report-meta-top{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:16px;}
+  .report-kicker{font-size:10px;letter-spacing:3px;color:var(--muted);margin-bottom:4px;}
+  .report-title{font-size:22px;font-weight:800;}
+  .report-subtitle{font-size:13px;color:var(--muted);margin-top:3px;}
+  .report-stats{display:flex;gap:12px;}
+  .rstat{background:rgba(255,255,255,.07);border-radius:8px;padding:8px 14px;text-align:center;}
+  .rstat-val{font-size:18px;font-weight:800;}
+  .rstat-label{font-size:10px;color:var(--muted);}
+  .tabs{display:flex;gap:2px;}
+  .tab-btn{background:transparent;color:var(--muted);border:1px solid var(--border);border-bottom:none;border-radius:8px 8px 0 0;padding:7px 16px;font-size:12px;transition:all .2s;}
+  .tab-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+
+  /* TAB CONTENT */
+  .tab-content{padding:20px 24px;max-width:860px;margin:0 auto;}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;}
+  .v-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px 18px;}
+  .v-card-title{font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:6px;}
+  .v-card-val{font-size:16px;font-weight:700;}
+  .v-card-sub{font-size:12px;color:var(--muted);margin-top:4px;}
+  .progress-bar-wrap{margin-top:10px;height:6px;background:var(--border);border-radius:3px;}
+  .progress-bar{height:6px;background:var(--accent);border-radius:3px;}
+  .progress-label{font-size:10px;color:var(--muted);margin-top:3px;}
+  .findings-card{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+  .findings-header{padding:12px 18px;border-bottom:1px solid var(--border);font-size:12px;font-weight:700;color:var(--muted);letter-spacing:1px;}
+  .findings-body{padding:14px 18px;display:flex;flex-direction:column;gap:10px;}
+  .finding{display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.5;}
+  .finding-icon{flex-shrink:0;font-size:15px;}
+  .finding-text{color:#c8d8e8;}
+
+  /* ANOMALIES */
+  .anomaly-alert{border-radius:8px;padding:10px 16px;margin-bottom:14px;font-size:12px;}
+  .anomaly-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:10px;}
+  .anomaly-top{display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:8px;align-items:center;}
+  .anomaly-badge{font-weight:700;font-size:12px;}
+  .anomaly-time{font-size:12px;color:var(--muted);}
+  .anomaly-details{display:flex;gap:16px;font-size:12px;color:#aac;}
+  .anomaly-details strong{color:var(--text);}
+
+  /* TIMELINE */
+  .tl-card{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+  .tl-header{padding:12px 18px;border-bottom:1px solid var(--border);font-size:12px;font-weight:700;color:var(--muted);letter-spacing:1px;}
+  .tl-row{display:flex;border-bottom:1px solid var(--border);}
+  .tl-row:last-child{border-bottom:none;}
+  .tl-time{width:70px;flex-shrink:0;padding:12px 0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--muted);border-left:1px solid var(--border);background:var(--surface);}
+  .tl-dot-col{width:36px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;position:relative;}
+  .tl-line{position:absolute;top:0;bottom:0;left:50%;width:1px;background:var(--border);transform:translateX(-50%);}
+  .tl-dot{position:relative;z-index:1;margin-top:14px;width:10px;height:10px;border-radius:50%;}
+  .tl-event{flex:1;padding:12px 14px 12px 0;font-size:13px;color:#c8d8e8;display:flex;align-items:center;gap:8px;}
+  .tl-icon{font-size:14px;}
+
+  /* COVERAGE */
+  .coverage-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+  .coverage-item{background:var(--card);border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;font-size:13px;}
+  .info-box{border-radius:8px;padding:10px 16px;font-size:12px;}
+
+  /* PATROL CARDS */
+  .patrol-card{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:12px;}
+  .patrol-header{padding:12px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+  .patrol-name{font-weight:700;font-size:15px;}
+  .patrol-time{font-size:12px;color:var(--muted);margin-top:2px;}
+  .patrol-km{font-size:20px;font-weight:800;color:var(--accentHi);}
+  .patrol-body{padding:12px 18px;}
+  .zones{display:flex;flex-wrap:wrap;gap:6px;}
+  .admin-note{border-radius:8px;padding:10px 16px;font-size:12px;margin-top:8px;}
+
+  @media(max-width:600px){
+    .stats-grid{grid-template-columns:repeat(2,1fr);}
+    .two-col{grid-template-columns:1fr;}
+    .coverage-grid{grid-template-columns:1fr;}
+    .report-stats{gap:8px;}
+    .rstat{padding:6px 10px;}
+    .page{padding:16px;}
+    .tab-content{padding:16px;}
+    .tabs{overflow-x:auto;}
+  }
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+<div id="app"></div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────────
+const USERS = {
+  "ביטחון":{ password:"bracha2026", role:"admin",  label:"רכז ביטחון" },
+  "סייר1":  { password:"sayer1",    role:"patrol", label:"סייר" },
+  "סייר2":  { password:"sayer2",    role:"patrol", label:"סייר" },
+  "סייר3":  { password:"sayer3",    role:"patrol", label:"סייר" },
+};
+
+const REPORTS = [{
+  id:"20260529-day", date:"29/05/2026", shift:"יום",
+  shiftHours:"06:00 – 22:00", vehicle:"רכב כבד",
+  km:91, patrols:4, anomalies:6, status:"warning",
+  summary:"כיסוי מלא. 6 עצירות חריגות מעל 30 דקות. עצירה ממושכת בסוף משמרת.",
+  engineOn:52, engineOff:48, speedMax:64,
+  patrolDetails:[
+    {name:"בנצי ונחוצקר", start:"06:04",end:"09:59",duration:"~3:55",km:"~26",zones:["הגבעה המערבית","ברכה מרכזי","גבעת רונן","ציר העלייה"]},
+    {name:"אביאל אייזיק",  start:"10:03",end:"13:40",duration:"~3:37",km:"~31",zones:["ברכה מרכזי","הגבעה המערבית","גבעת רונן","צומת ברכה"]},
+    {name:"שמואל הורן",    start:"13:40",end:"16:07",duration:"~2:27",km:"~18",zones:["ברכה מרכזי","גבעת רונן","הגבעה המערבית"]},
+    {name:"שמוליק ברום",   start:"16:07",end:"20:09",duration:"~4:02",km:"~39",zones:["ברכה מרכזי","גבעת רונן","הגבעה המערבית","מרחב ציר אסנת","צומת ברכה"]},
+  ],
+  anomalyList:[
+    {time:"06:21–07:43",location:"גבעת רונן",    duration:"82 דק'",  engine:"מנוע כבוי",level:"orange"},
+    {time:"09:10–09:44",location:"גבעת רונן",    duration:"34 דק'",  engine:"מנוע כבוי",level:"yellow"},
+    {time:"10:08–11:09",location:"ברכה מרכזי",   duration:"61 דק'",  engine:"מנוע כבוי",level:"orange"},
+    {time:"11:14–12:28",location:"הגבעה המערבית",duration:"74 דק'",  engine:"מנוע כבוי",level:"orange"},
+    {time:"13:07–17:07",location:"ברכה מרכזי",   duration:"~236 דק'",engine:"מנוע כבוי",level:"orange"},
+    {time:"20:26–22:00+",location:"ברכה מרכזי",  duration:">101 דק'",engine:"מנוע כבוי",level:"red"},
+  ],
+  coverage:["ברכה מרכזי","גבעת רונן","הגבעה המערבית","ציר העלייה (555)","צומת ברכה","מרחב ציר אסנת"],
+  findings:[
+    {icon:"✅",text:"כיסוי מלא של כל אזורי הגזרה."},
+    {icon:"✅",text:"מהירות נהיגה תקינה לאורך כל המשמרת (מקס' 64 קמ\"ש)."},
+    {icon:"⚠️",text:"6 עצירות חריגות מעל 30 דקות – 5 מתוכן עם מנוע כבוי."},
+    {icon:"🔴",text:"עצירה ממושכת בסוף משמרת (מ-20:26) – הרכב לא חזר לסיור."},
+    {icon:"ℹ️",text:"מרחב ציר אסנת תועד בגבולות הגזרה."},
+  ],
+  timeline:[
+    {time:"06:04",event:"פתיחת משמרת – הגבעה המערבית",type:"start"},
+    {time:"06:21",event:"עצירה – גבעת רונן (82 דק', מנוע כבוי)",type:"stop"},
+    {time:"07:43",event:"חידוש סיור",type:"move"},
+    {time:"09:59",event:"החלפת סייר ← אביאל אייזיק",type:"change"},
+    {time:"10:08",event:"עצירה – ברכה מרכזי (61 דק', מנוע כבוי)",type:"stop"},
+    {time:"11:14",event:"עצירה – הגבעה המערבית (74 דק')",type:"stop"},
+    {time:"13:40",event:"החלפת סייר ← שמואל הורן",type:"change"},
+    {time:"16:07",event:"החלפת סייר ← שמוליק ברום",type:"change"},
+    {time:"17:55",event:"כניסה למרחב ציר אסנת",type:"info"},
+    {time:"20:26",event:"עצירה ממושכת סוף משמרת – ברכה מרכזי",type:"stop"},
+    {time:"22:00",event:"סיום תקופת הדוח",type:"end"},
+  ],
+}];
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let state = { screen:"login", user:null, report:null, tab:"summary" };
+
+function setState(patch){ Object.assign(state,patch); render(); }
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+const C = {
+  accent:"#2d7dd2",accentHi:"#4a9eff",muted:"#6b8299",
+  green:"#38a169",yellow:"#d69e2e",orange:"#dd6b20",red:"#e53e3e",
+  border:"#243447",card:"#1c2a3a",surface:"#162030",text:"#e8edf2"
+};
+const levelColor = {red:C.red,orange:C.orange,yellow:C.yellow};
+const typeColor  = {start:C.green,end:C.red,move:C.accent,stop:C.orange,change:"#805ad5",info:C.muted};
+const typeIcon   = {start:"▶",end:"■",move:"→",stop:"⏸",change:"⇄",info:"i"};
+
+function tag(text,color){
+  const c=color||C.accent;
+  return `<span class="tag" style="background:${c}22;color:${c};border:1px solid ${c}44">${text}</span>`;
+}
+function badge(status){
+  const m={ok:["badge-ok","תקין"],warning:["badge-warning","חריגות"],alert:["badge-alert","התראה"]};
+  const [cls,label]=(m[status]||["badge-ok","?"]);
+  return `<span class="badge ${cls}">${label}</span>`;
+}
+
+// ── SCREENS ───────────────────────────────────────────────────────────────────
+function loginHTML(){
+  return `
+  <div id="login-screen">
+    <div class="login-box" id="login-box">
+      <div class="login-logo">
+        <div class="login-icon">🛡️</div>
+        <div class="login-title">הר ברכה</div>
+        <div class="login-sub">פורטל ביטחון</div>
+      </div>
+      <div class="field-wrap">
+        <div class="field-label">שם משתמש</div>
+        <input class="field-input" id="inp-user" type="text" placeholder="הזן שם משתמש" autocomplete="username"/>
+      </div>
+      <div class="field-wrap">
+        <div class="field-label">סיסמה</div>
+        <input class="field-input" id="inp-pass" type="password" placeholder="הזן סיסמה" autocomplete="current-password"/>
+      </div>
+      <div class="login-err" id="login-err" style="display:none">שם משתמש או סיסמה שגויים</div>
+      <button class="login-btn" onclick="doLogin()">כניסה למערכת</button>
+      <div class="login-footer">גישה מורשית בלבד · הר ברכה</div>
+    </div>
+  </div>`;
+}
+
+function dashboardHTML(){
+  const u=state.user;
+  const totalKm=REPORTS.reduce((a,r)=>a+r.km,0);
+  const totalAnom=REPORTS.reduce((a,r)=>a+r.anomalies,0);
+  const allPatrollers=[...new Set(REPORTS.flatMap(r=>r.patrolDetails.map(p=>p.name)))];
+
+  const statsHTML=[
+    {label:"דוחות יומיים",val:REPORTS.length,icon:"📋",color:C.accent},
+    {label:"חריגות השבוע",val:totalAnom,icon:"⚠️",color:C.orange},
+    {label:"ק\"מ השבוע",val:totalKm,icon:"🛣️",color:C.green},
+    {label:"סיירים פעילים",val:allPatrollers.length,icon:"👤",color:"#805ad5"},
+  ].map(s=>`
+    <div class="stat-card" style="border-top:2px solid ${s.color}">
+      <div class="stat-icon">${s.icon}</div>
+      <div class="stat-val" style="color:${s.color}">${s.val}</div>
+      <div class="stat-label">${s.label}</div>
+    </div>`).join("");
+
+  const reportsHTML=REPORTS.map(r=>`
+    <div class="report-card" onclick="openReport('${r.id}')">
+      <div class="report-card-left">
+        <div class="report-card-meta">
+          <span class="report-date">${r.date}</span>
+          ${tag(r.shift==="יום"?"☀️ יום":"🌙 לילה")}
+          ${badge(r.status)}
+        </div>
+        <div class="report-summary">${r.summary}</div>
+      </div>
+      <div class="report-card-right">
+        <div class="stat-mini">
+          <div class="stat-mini-val" style="color:${C.accentHi}">${r.km}</div>
+          <div class="stat-mini-label">ק"מ</div>
+        </div>
+        <div class="stat-mini">
+          <div class="stat-mini-val" style="color:${r.anomalies>3?C.orange:C.green}">${r.anomalies}</div>
+          <div class="stat-mini-label">חריגות</div>
+        </div>
+        <div class="arrow">←</div>
+      </div>
+    </div>`).join("");
+
+  const addCard=u.role==="admin"?`<div class="add-card">+ העלאת דוח חדש (בקרוב)</div>`:"";
+
+  return `
+  <div class="topbar">
+    <div class="topbar-left">
+      <span style="font-size:20px">🛡️</span>
+      <div><span class="topbar-title">הר ברכה</span><span class="topbar-sub">· פורטל ביטחון</span></div>
+    </div>
+    <div class="topbar-right">
+      <span class="topbar-user">${u.label} · <strong>${u.username}</strong></span>
+      <button class="btn-ghost" onclick="doLogout()">יציאה</button>
+    </div>
+  </div>
+  <div class="page">
+    <div class="stats-grid">${statsHTML}</div>
+    <div class="section-header">
+      <div class="section-title">דוחות יומיים</div>
+      <div class="section-hint">לחץ על דוח לצפייה</div>
+    </div>
+    <div class="report-list">${reportsHTML}</div>
+    ${addCard}
+  </div>`;
+}
+
+function reportHTML(){
+  const r=state.report, t=state.tab, isAdmin=state.user.role==="admin";
+  const tabs=[["summary","סיכום"],["anomalies","חריגות"],["timeline","ציר זמן"],["coverage","כיסוי"]];
+  if(isAdmin) tabs.push(["patrols","סיירים"]);
+
+  const tabBtns=tabs.map(([k,l])=>`<button class="tab-btn${t===k?" active":""}" onclick="setTab('${k}')">${l}</button>`).join("");
+
+  let content="";
+
+  if(t==="summary"){
+    const findings=r.findings.map(f=>`<div class="finding"><span class="finding-icon">${f.icon}</span><span class="finding-text">${f.text}</span></div>`).join("");
+    content=`
+      <div class="two-col">
+        <div class="v-card" style="border-right:3px solid ${C.accent}">
+          <div class="v-card-title">רכב כבד</div>
+          <div class="v-card-val" style="color:${C.accentHi}">פעיל</div>
+          <div class="v-card-sub">${r.km} ק"מ · ${r.patrols} סיירים</div>
+          <div class="progress-bar-wrap"><div class="progress-bar" style="width:${r.engineOn}%"></div></div>
+          <div class="progress-label">מנוע דולק ${r.engineOn}% · כבוי ${r.engineOff}%</div>
+        </div>
+        <div class="v-card" style="border-right:3px solid ${C.muted}">
+          <div class="v-card-title">רכב קל</div>
+          <div class="v-card-val" style="color:${C.muted}">ללא פעילות</div>
+          <div class="v-card-sub">לא תועד בטווח זמן הדוח</div>
+        </div>
+      </div>
+      <div class="findings-card">
+        <div class="findings-header">ממצאים עיקריים</div>
+        <div class="findings-body">${findings}</div>
+      </div>`;
+  }
+
+  if(t==="anomalies"){
+    const cards=r.anomalyList.map(a=>{
+      const c=levelColor[a.level]||C.muted;
+      const em=a.level==="red"?"🔴":a.level==="orange"?"🟠":"🟡";
+      return `<div class="anomaly-card" style="border-right:3px solid ${c}">
+        <div class="anomaly-top">
+          <div class="anomaly-badge" style="color:${c}">${em} עצירה חריגה &nbsp;${tag(a.location,c)}</div>
+          <div class="anomaly-time">${a.time}</div>
+        </div>
+        <div class="anomaly-details">
+          <span>משך: <strong>${a.duration}</strong></span>
+          <span>מנוע: <strong>${a.engine}</strong></span>
+        </div>
+      </div>`;}).join("");
+    content=`
+      <div class="anomaly-alert" style="background:${C.red}15;border:1px solid ${C.red}44;color:${C.red}">
+        ⚠️ ${r.anomalyList.length} חריגות זוהו במשמרת זו – כל החריגות הן עצירות מעל 30 דקות (סף יום)
+      </div>${cards}`;
+  }
+
+  if(t==="timeline"){
+    const rows=r.timeline.map((item,i)=>{
+      const c=typeColor[item.type]||C.muted;
+      return `<div class="tl-row">
+        <div class="tl-time">${item.time}</div>
+        <div class="tl-dot-col">
+          <div class="tl-line"></div>
+          <div class="tl-dot" style="background:${c};box-shadow:0 0 6px ${c}"></div>
+        </div>
+        <div class="tl-event">
+          <span class="tl-icon" style="color:${c}">${typeIcon[item.type]}</span>
+          <span>${item.event}</span>
+        </div>
+      </div>`;}).join("");
+    content=`<div class="tl-card"><div class="tl-header">ציר זמן מבצעי</div>${rows}</div>`;
+  }
+
+  if(t==="coverage"){
+    const items=r.coverage.map(z=>`
+      <div class="coverage-item" style="border:1px solid ${C.green}33;border-right:3px solid ${C.green}">
+        <span style="color:${C.green}">✓</span>
+        <span style="font-weight:600">${z}</span>
+      </div>`).join("");
+    content=`
+      <div class="coverage-grid">${items}</div>
+      <div class="info-box" style="background:${C.accent}15;border:1px solid ${C.accent}33;color:${C.accentHi}">
+        ℹ️ כל אזורי הגזרה כוסו במהלך המשמרת
+      </div>`;
+  }
+
+  if(t==="patrols" && isAdmin){
+    const cards=r.patrolDetails.map(p=>`
+      <div class="patrol-card">
+        <div class="patrol-header" style="background:rgba(45,125,210,0.1)">
+          <div>
+            <div class="patrol-name">${p.name}</div>
+            <div class="patrol-time">${p.start} – ${p.end} · ${p.duration}</div>
+          </div>
+          <div class="patrol-km">${p.km} ק"מ</div>
+        </div>
+        <div class="patrol-body">
+          <div class="zones">${p.zones.map(z=>tag(z)).join("")}</div>
+        </div>
+      </div>`).join("");
+    content=`${cards}
+      <div class="admin-note" style="background:${C.yellow}15;border:1px solid ${C.yellow}33;color:${C.yellow}">
+        🔒 מידע זה מוצג לרכז ביטחון בלבד
+      </div>`;
+  }
+
+  return `
+  <div class="report-header">
+    <div class="report-topbar">
+      <div style="display:flex;align-items:center;gap:10px">
+        <button class="btn-ghost" onclick="goBack()">← חזרה</button>
+        <span style="font-size:12px;color:${C.muted}">🛡️ הר ברכה · פורטל ביטחון</span>
+      </div>
+      ${badge(r.status)}
+    </div>
+    <div class="report-meta">
+      <div class="report-meta-top">
+        <div>
+          <div class="report-kicker">דוח מבצעי יומי</div>
+          <div class="report-title">${r.date} · משמרת ${r.shift}</div>
+          <div class="report-subtitle">${r.shiftHours} · ${r.vehicle}</div>
+        </div>
+        <div class="report-stats">
+          <div class="rstat"><div class="rstat-val" style="color:${C.accentHi}">${r.km} ק"מ</div><div class="rstat-label">מרחק</div></div>
+          <div class="rstat"><div class="rstat-val" style="color:${C.accentHi}">${r.patrols}</div><div class="rstat-label">סיירים</div></div>
+          <div class="rstat"><div class="rstat-val" style="color:${r.anomalies>3?C.orange:C.accentHi}">${r.anomalies}</div><div class="rstat-label">חריגות</div></div>
+        </div>
+      </div>
+      <div class="tabs">${tabBtns}</div>
+    </div>
+  </div>
+  <div class="tab-content">${content}</div>`;
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function render(){
+  const app=document.getElementById("app");
+  if(state.screen==="login")     app.innerHTML=loginHTML();
+  else if(state.screen==="dash") app.innerHTML=dashboardHTML();
+  else if(state.screen==="report") app.innerHTML=reportHTML();
+
+  if(state.screen==="login"){
+    document.getElementById("inp-pass").addEventListener("keydown",e=>{ if(e.key==="Enter") doLogin(); });
+    document.getElementById("inp-user").addEventListener("keydown",e=>{ if(e.key==="Enter") doLogin(); });
+  }
+}
+
+// ── ACTIONS ───────────────────────────────────────────────────────────────────
+function doLogin(){
+  const u=document.getElementById("inp-user").value.trim();
+  const p=document.getElementById("inp-pass").value.trim();
+  const found=USERS[u];
+  if(found && found.password===p){
+    setState({screen:"dash",user:{username:u,...found}});
+  } else {
+    document.getElementById("login-err").style.display="block";
+    const box=document.getElementById("login-box");
+    box.classList.add("shake");
+    setTimeout(()=>box.classList.remove("shake"),500);
+  }
+}
+function doLogout(){ setState({screen:"login",user:null,report:null,tab:"summary"}); }
+function openReport(id){
+  const r=REPORTS.find(x=>x.id===id);
+  if(r) setState({screen:"report",report:r,tab:"summary"});
+}
+function goBack(){ setState({screen:"dash",report:null,tab:"summary"}); }
+function setTab(t){ setState({tab:t}); }
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>

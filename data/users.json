@@ -1,0 +1,6 @@
+{
+  "ביטחון": { "password": "bracha2026", "role": "admin",  "label": "רכז ביטחון" },
+  "סייר1":  { "password": "sayer1",     "role": "patrol", "label": "סייר" },
+  "סייר2":  { "password": "sayer2",     "role": "patrol", "label": "סייר" },
+  "סייר3":  { "password": "sayer3",     "role": "patrol", "label": "סייר" }
+}
